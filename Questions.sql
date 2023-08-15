@@ -108,44 +108,93 @@ select * from worker left join worker_clone using(worker_id) where worker_clone.
 select curdate();
 
 -- Q-32. Write an SQL query to show the top n (say 5) records of a table order by descending salary.
-
-
+select * from worker order by salary desc limit 5;
 
 -- Q-33. Write an SQL query to determine the nth (say n=5) highest salary from a table.
+-- select * from worker order by salary desc limit 5;
+select * from worker order by salary desc limit 4,1;
 
 -- Q-34. Write an SQL query to determine the 5th highest salary without using LIMIT keyword.
+-- select * from worker order by salary desc limit 4,1;
+select * from worker w1
+where 4 = (
+    select count(distinct (w2.salary))
+    from worker w2 
+    where w2.salary >= w1.salary
+);
 
 -- Q-35. Write an SQL query to fetch the list of employees with the same salary.
+select w1.* from worker w1, worker w2 where w1.salary = w2.salary and w1.worker_id != w2.worker_id;
 
 -- Q-36. Write an SQL query to show the second highest salary from a table using sub-query.
+select max(salary) from worker
+where salary not in (select max(salary) from worker);
 
 -- Q-37. Write an SQL query to show one row twice in results from a table.
+select * from worker
+union all
+select * from worker order by WORKER_ID;
 
 -- Q-38. Write an SQL query to list worker_id who does not get bonus.
+select w.* from worker as w left join bonus as b on w.worker_id = b.worker_ref_id where b.worker_ref_id is null;
+select * from worker where worker_id not in (select worker_ref_id from bonus);
 
 -- Q-39. Write an SQL query to fetch the first 50% records from a table.
+select * from worker where worker_id <= (select count(worker_id) from worker)/2;
 
 -- Q-40. Write an SQL query to fetch the departments that have less than 4 people in it.
+select department, count(worker_id) from worker group by department having count(worker_id) < 4;
 
 -- Q-41. Write an SQL query to show all departments along with the number of people in there.
+select department, count(worker_id) from worker group by department;
 
 -- Q-42. Write an SQL query to show the last record from a table.
+select * from worker where worker_id = (select max(worker_id) from worker);
 
 -- Q-43. Write an SQL query to fetch the first row of a table.
+select * from worker where worker_id = (select min(worker_id) from worker);
 
 -- Q-44. Write an SQL query to fetch the last five records from a table.
+select * from worker where worker_id >= ((select count(worker_id) from worker) - 4);
+(select * from worker order by worker_id desc limit 5) order by worker_id;
 
 -- Q-45. Write an SQL query to print the name of employees having the highest salary in each department.
+select w.department, w.first_name, w.salary from 
+(select max(salary) as max_salary, department from worker group by department) temp
+inner join worker w on temp.department = w.department and temp.max_salary = w.salary;
+;
 
 -- Q-46. Write an SQL query to fetch three max salaries from a table using co-related subquery
+-- select * from worker order by salary desc limit 3;
+select distinct salary from worker w1
+where 3 >= (
+    select count(distinct (w2.salary))
+    from worker w2 
+    where w2.salary >= w1.salary
+) order by w1.salary desc;
 
 -- DRY RUN AFTER REVISING THE CORELATED SUBQUERY CONCEPT FROM LEC-9.
 
 -- Q-47. Write an SQL query to fetch three min salaries from a table using co-related subquery
+select distinct salary from worker w1
+where ((select count(worker_id) from worker) -  4) > (
+    select count(distinct (w2.salary))
+    from worker w2 
+    where w2.salary >= w1.salary
+) order by w1.salary desc;
 
--- Q-48. Write an SQL query to fetch nth max salaries from a table.
+-- Q-48. Write an SQL query to fetch nth(4) max salaries from a table.
+select distinct salary from worker w1
+where 4 >= (
+    select count(distinct (w2.salary))
+    from worker w2 
+    where w2.salary >= w1.salary
+) order by w1.salary desc;
 
 -- Q-49. Write an SQL query to fetch departments along with the total salaries paid for each of them.
+select department, sum(salary) as dep_salary from worker group by department;
 
 -- Q-50. Write an SQL query to fetch the names of workers who earn the highest salary.
+select first_name, salary from worker where salary = (select max(salary) from worker);
 
+-- Q-51. 
