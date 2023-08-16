@@ -174,13 +174,14 @@ where 3 >= (
 ) order by w1.salary desc;
 
 -- DRY RUN AFTER REVISING THE CORELATED SUBQUERY CONCEPT FROM LEC-9.
+select distinct salary from worker order by salary desc limit 3;
 
 -- Q-47. Write an SQL query to fetch three min salaries from a table using co-related subquery
 select distinct salary from worker w1
-where ((select count(worker_id) from worker) -  4) > (
+where 3 >= (
     select count(distinct (w2.salary))
     from worker w2 
-    where w2.salary >= w1.salary
+    where w2.salary <= w1.salary
 ) order by w1.salary desc;
 
 -- Q-48. Write an SQL query to fetch nth(4) max salaries from a table.
@@ -192,9 +193,47 @@ where 4 >= (
 ) order by w1.salary desc;
 
 -- Q-49. Write an SQL query to fetch departments along with the total salaries paid for each of them.
-select department, sum(salary) as dep_salary from worker group by department;
+select department, sum(salary) as dep_salary from worker group by department order by dep_salary desc;
 
 -- Q-50. Write an SQL query to fetch the names of workers who earn the highest salary.
 select first_name, salary from worker where salary = (select max(salary) from worker);
 
--- Q-51. 
+/*markdown
+-- Q-51. remove all the reversed number pairs from given table
+| A | B |
+| - | - |
+| 1 | 2 |
+| 2 | 4 |
+| 2 | 1 |
+| 3 | 2 |
+| 4 | 2 |
+| 5 | 6 |
+| 6 | 5 |
+| 7 | 8 |
+
+Expected output:
+| A | B |
+| - | - |
+| 1 | 2 |
+| 2 | 4 |
+| 3 | 2 |
+| 5 | 6 |
+| 7 | 8 |
+*/
+
+-- Sol-51. remove all reversed pairs from given table
+create table pairs (
+    A int, 
+    B int
+);
+
+insert into pairs values (1, 2), (2,4), (2,1), (3,2), (4,2), (5,6), (6,5), (7,8);
+
+select * from pairs;
+
+-- method 1. Using joins (left join)
+select lt.* from pairs lt left join pairs rt on lt.A = rt.B and lt.B = rt.A
+where rt.A is null or lt.A < rt.A;
+
+-- method 2. Using co-related subquery
+select * from pairs p1 where not exists (select * from pairs p2 where p1.B = p2.A and p1.A = p2.B and p1.A > p2.A);
