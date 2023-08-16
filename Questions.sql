@@ -94,7 +94,7 @@ select * from worker where mod(worker_id, 2) = 0;
 -- Q-28. Write an SQL query to clone a new table from another table.
 -- create table worker_clone like worker;
 -- insert into worker_clone select * from worker;
--- select * from worker_clone;
+select * from worker_clone;
 
 -- Q-29. Write an SQL query to fetch intersecting records of two tables.
 select * from worker as w inner join worker_clone as c using(worker_id);
