@@ -8,15 +8,13 @@ SHOW DATABASES;
 ### Create Database ORG
 */
 
-CREATE DATABASE ORG;
-
-SHOW DATABASES;
+create database ORG;
 
 /*markdown
 ### Select Database ORG
 */
 
-USE ORG;
+use ORG;
 
 /*markdown
 ### Create Table Worker
